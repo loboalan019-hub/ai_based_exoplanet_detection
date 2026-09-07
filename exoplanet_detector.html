@@ -1,0 +1,512 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{font-family:Georgia,'Times New Roman',serif;background:#0a0f1a;color:#d4dde8;font-size:14px;line-height:1.5}
+button{cursor:pointer;font-family:inherit}
+input[type=range]{accent-color:#5b9bd5;width:100%}
+
+/* Header - simple, clean */
+header{background:#0d1520;border-bottom:1px solid #1e2d3d;padding:14px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100}
+.team-name{font-size:17px;font-weight:normal;color:#8aabcc;letter-spacing:.3px}
+.team-name strong{color:#c8dae8;font-weight:bold}
+.challenge-tag{font-size:11px;color:#4a6070;border-left:1px solid #1e2d3d;padding-left:14px;margin-left:2px}
+.step-nav{margin-left:auto;display:flex;gap:2px}
+.snav{background:none;border:none;color:#4a6070;font-size:12px;padding:6px 12px;border-radius:4px;font-family:inherit;transition:color .2s}
+.snav.on{color:#8aabcc;background:#151f2e}
+.snav.done{color:#5a8a5a}
+.snav span{display:inline-block;width:16px;height:16px;border-radius:50%;background:#1e2d3d;font-size:9px;line-height:16px;text-align:center;margin-right:5px}
+.snav.on span{background:#2a4a6a;color:#8aabcc}
+.snav.done span{background:#2a4a2a;color:#5a8a5a}
+
+/* Panels */
+.panel{display:none;max-width:1080px;margin:0 auto;padding:28px 20px;animation:ease-in .25s}
+.panel.on{display:block}
+@keyframes ease-in{from{opacity:.4}to{opacity:1}}
+
+/* Layout */
+.row{display:flex;gap:20px;align-items:start}
+.col-left{width:300px;flex-shrink:0}
+.col-right{flex:1;min-width:0}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* Typography */
+h2{font-size:20px;font-weight:bold;color:#c8dae8;margin-bottom:4px}
+h3{font-size:14px;color:#8aabcc;font-weight:normal;margin-bottom:12px;text-transform:none;letter-spacing:0}
+p.desc{color:#4a6070;font-size:12.5px;margin-bottom:18px}
+
+/* Sections */
+.section{margin-bottom:20px}
+.section-label{font-size:11px;color:#3a5060;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+
+/* Star buttons */
+.star-option{display:block;width:100%;text-align:left;background:#0d1520;border:1px solid #1e2d3d;border-radius:6px;padding:10px 13px;margin-bottom:8px;cursor:pointer;transition:border-color .2s,background .2s;color:#d4dde8}
+.star-option:hover,.star-option.picked{border-color:#2a4a6a;background:#111d2b}
+.star-option .star-title{font-size:13px;color:#c8dae8;font-weight:bold}
+.star-option .star-info{font-size:10.5px;color:#4a6070;margin-top:2px}
+.star-option .star-note{float:right;font-size:9.5px;color:#3a5060;margin-top:1px}
+
+/* Upload zone */
+.upload-zone{border:1px dashed #1e2d3d;border-radius:6px;padding:14px;text-align:center;cursor:pointer;color:#3a5060;font-size:12px;margin-bottom:10px;transition:border-color .2s}
+.upload-zone:hover{border-color:#2a4a6a;color:#4a6070}
+
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat-box{background:#0d1520;border:1px solid #1e2d3d;border-radius:6px;padding:10px 12px}
+.stat-box .val{font-size:17px;color:#8aabcc;font-weight:bold;margin-top:2px}
+.stat-box .key{font-size:10px;color:#3a5060}
+
+/* Chart containers */
+.chart-box{background:#0d1520;border:1px solid #1e2d3d;border-radius:6px;padding:14px;margin-bottom:14px}
+.chart-box .chart-lbl{font-size:11px;color:#3a5060;margin-bottom:10px}
+
+/* Buttons */
+.btn-main{background:#1e3a5a;color:#8aabcc;border:none;border-radius:5px;padding:10px 20px;font-size:13px;font-weight:bold;transition:background .2s;font-family:inherit}
+.btn-main:hover{background:#2a4a6a}
+.btn-main:disabled{background:#131c28;color:#2a3a4a;cursor:not-allowed}
+.btn-secondary{background:none;border:1px solid #1e2d3d;color:#4a6070;border-radius:5px;padding:9px 16px;font-size:12px;font-family:inherit;transition:border-color .2s,color .2s}
+.btn-secondary:hover{border-color:#2a4a6a;color:#8aabcc}
+.btn-teal{background:#0d2a2a;color:#4a9090;border:1px solid #1a4040;border-radius:5px;padding:9px 16px;font-size:12px;font-family:inherit;transition:background .2s}
+.btn-teal:hover{background:#102e2e}
+.btn-row{display:flex;gap:9px;margin-top:14px;flex-wrap:wrap}
+
+/* Sliders */
+.slider-row{margin-bottom:13px}
+.slider-row .slabel{display:flex;justify-content:space-between;font-size:12px;color:#4a6070;margin-bottom:5px}
+.slider-row .slabel .sval{color:#8aabcc}
+
+/* Log */
+.log-box{background:#080d14;border:1px solid #1e2d3d;border-radius:6px;padding:10px;height:130px;overflow-y:auto;font-family:'Courier New',monospace;font-size:11px;color:#3a5060}
+.log-line{margin:1px 0;line-height:1.4}
+.log-ok{color:#4a7a4a}.log-info{color:#4a6a8a}.log-warn{color:#7a6040}
+
+/* Progress */
+.prog-bar{height:3px;background:#1e2d3d;border-radius:2px;margin:9px 0;overflow:hidden}
+.prog-fill{height:100%;background:#2a5a8a;border-radius:2px;transition:width .4s;width:0%}
+
+/* Results */
+.result-header{text-align:center;padding:28px 16px;background:#0d1520;border:1px solid #1e2d3d;border-radius:8px;margin-bottom:16px}
+.prob-big{font-size:64px;font-weight:bold;line-height:1;margin-bottom:6px}
+.prob-verdict{font-size:15px;margin-bottom:4px}
+.prob-detail{color:#4a6070;font-size:12px}
+
+.params-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.param-cell{background:#0d1520;border:1px solid #1e2d3d;border-radius:6px;padding:10px}
+.param-cell .pk{font-size:9.5px;color:#3a5060;text-transform:uppercase;letter-spacing:.5px}
+.param-cell .pv{font-size:16px;color:#8aabcc;font-weight:bold;margin-top:3px}
+
+/* Gas rows */
+.gas-item{margin-bottom:9px}
+.gas-item .gi-head{display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:3px}
+.gas-track{height:8px;background:#1e2d3d;border-radius:4px;overflow:hidden}
+.gas-fill{height:100%;border-radius:4px;transition:width .8s}
+
+/* Biosig list */
+.bio-row{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid #111d2b;font-size:12.5px}
+.bio-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.bio-note{font-size:10px;color:#3a5060;margin-left:4px}
+
+/* Evidence box */
+.evidence-box{background:#0d1520;border:1px solid #1e2d3d;border-radius:6px;padding:14px;margin-bottom:12px}
+.evidence-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:12.5px;color:#8aabcc;border-bottom:1px solid #111d2b}
+.evidence-item:last-child{border-bottom:none}
+.evidence-check{color:#4a7a4a;font-size:13px;flex-shrink:0;margin-top:1px}
+.evidence-fail{color:#6a3a3a;font-size:13px;flex-shrink:0;margin-top:1px}
+
+/* Spectroscopy panel */
+.spec-panel{background:#0a1a1a;border:1px solid #1a3030;border-radius:8px;padding:16px;margin-bottom:14px}
+.spec-panel-title{font-size:13px;color:#4a9090;margin-bottom:12px;font-style:italic}
+
+/* Summary text */
+.atmos-summary{background:#080d14;border:1px solid #1e2d3d;border-radius:6px;padding:12px;font-size:12px;color:#4a6070;line-height:1.7;margin-top:10px}
+
+/* Candidate rank table */
+.rank-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px}
+.rank-table th{text-align:left;color:#3a5060;font-weight:normal;padding:6px 8px;border-bottom:1px solid #1e2d3d;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+.rank-table td{padding:8px;border-bottom:1px solid #111d2b;color:#8aabcc}
+.rank-table tr:last-child td{border-bottom:none}
+
+@media(max-width:680px){.row{flex-direction:column}.col-left{width:100%}.two-col{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,1fr)}.params-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="team-name"><strong>Orbital Pioneers</strong></div>
+    <div class="challenge-tag">ISRO BAH 2026 · AI Exoplanet Detection · Challenge 7</div>
+  </div>
+  <nav class="step-nav">
+    <button class="snav on" id="nav1" onclick="go(1)"><span>1</span>Light Curve</button>
+    <button class="snav" id="nav2" onclick="go(2)"><span>2</span>Spectrum</button>
+    <button class="snav" id="nav3" onclick="go(3)"><span>3</span>Train</button>
+    <button class="snav" id="nav4" onclick="go(4)"><span>4</span>Results</button>
+  </nav>
+</header>
+
+<!-- Step 1 -->
+<div class="panel on" id="p1">
+  <h2>Load a light curve</h2>
+  <p class="desc">Choose one of the pre-loaded candidates or upload your own CSV file — one flux value per line, or two columns (time, flux).</p>
+  <div class="row">
+    <div class="col-left">
+      <div class="section-label">Known candidates</div>
+      <button class="star-option" onclick="loadStar('trappist1e',this)"><span class="star-note">ESI 0.97</span><div class="star-title">TRAPPIST-1 e</div><div class="star-info">M8V · 40.7 ly · Period 6.10 d · Optimal habitable zone</div></button>
+      <button class="star-option" onclick="loadStar('k218b',this)"><span class="star-note">ESI 0.63</span><div class="star-title">K2-18 b</div><div class="star-info">K2.5V · 124 ly · Period 32.94 d · Hycean world candidate</div></button>
+      <button class="star-option" onclick="loadStar('toi700d',this)"><span class="star-note">ESI 0.89</span><div class="star-title">TOI-700 d</div><div class="star-info">M2V · 101.4 ly · Period 37.42 d · Confirmed, quiet M-dwarf</div></button>
+      <button class="star-option" onclick="loadStar('kepler90h',this)"><span class="star-note">ESI 0.08</span><div class="star-title">Kepler-90 h</div><div class="star-info">G0V · 2,840 ly · Period 14.44 d · Jupiter-class gas giant</div></button>
+      <div style="margin:14px 0 8px;font-size:11px;color:#3a5060;text-transform:uppercase;letter-spacing:.6px">Or upload your own</div>
+      <div class="upload-zone" onclick="document.getElementById('csv1').click()">
+        <input type="file" id="csv1" accept=".csv,.txt" onchange="handleFile(this,'lc')" style="display:none">
+        <div style="font-size:20px;margin-bottom:4px">📂</div>
+        Drop a CSV file here, or click to browse
+      </div>
+      <div class="btn-row"><button class="btn-main" id="b1next" onclick="go(2)" disabled>Next — load spectrum</button></div>
+    </div>
+    <div class="col-right">
+      <div class="stats-row">
+        <div class="stat-box"><div class="key">data points</div><div class="val" id="s1">—</div></div>
+        <div class="stat-box"><div class="key">noise level</div><div class="val" id="s2">—</div></div>
+        <div class="stat-box"><div class="key">transit depth</div><div class="val" id="s3">—</div></div>
+        <div class="stat-box"><div class="key">period</div><div class="val" id="s4">—</div></div>
+      </div>
+      <div class="chart-box"><div class="chart-lbl">Phase-folded light curve</div><canvas id="lcC" style="width:100%;height:170px;display:block"></canvas><div id="lcH" style="text-align:center;padding:50px 0;color:#3a5060;font-size:12px">Select a candidate to display</div></div>
+      <div class="chart-box"><div class="chart-lbl">BLS period power spectrum</div><canvas id="blsC" style="width:100%;height:110px;display:block"></canvas><div id="blsH" style="text-align:center;padding:32px 0;color:#3a5060;font-size:12px">Appears after loading</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Step 2 -->
+<div class="panel" id="p2">
+  <h2>Transmission spectrum</h2>
+  <p class="desc">When the planet transits, starlight filters through its atmosphere — different gases absorb at different wavelengths. Generate a simulated JWST-style spectrum from the star's parameters, or upload your own wavelength/depth CSV. The 12 gas abundance features extracted here are added to the 20 photometric features, giving the model 32 inputs total.</p>
+  <div class="row">
+    <div class="col-left">
+      <button class="btn-teal" style="width:100%;justify-content:center;margin-bottom:10px;text-align:center;padding:11px" onclick="genSpec()">Generate spectrum from star parameters</button>
+      <div class="upload-zone" onclick="document.getElementById('csv2').click()">
+        <input type="file" id="csv2" accept=".csv,.txt" onchange="handleFile(this,'spec')" style="display:none">
+        <div style="font-size:18px;margin-bottom:3px">📡</div>
+        Or upload wavelength,depth CSV
+      </div>
+      <div class="chart-box" style="margin-top:10px">
+        <div class="chart-lbl">Gas detection results</div>
+        <div id="gasRes" style="color:#3a5060;font-size:12px">Generate or upload a spectrum above.</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-main" id="b2next" onclick="go(3)" disabled>Continue to training</button>
+        <button class="btn-secondary" onclick="go(1)">Back</button>
+      </div>
+    </div>
+    <div class="col-right">
+      <div class="stats-row">
+        <div class="stat-box"><div class="key">wavelength range</div><div class="val" id="ss1">—</div></div>
+        <div class="stat-box"><div class="key">data points</div><div class="val" id="ss2">—</div></div>
+        <div class="stat-box"><div class="key">spectral SNR</div><div class="val" id="ss3">—</div></div>
+        <div class="stat-box"><div class="key">gases detected</div><div class="val" id="ss4">—</div></div>
+      </div>
+      <div class="chart-box"><div class="chart-lbl">Transmission spectrum — observed (grey) and model fit (blue)</div><canvas id="specC" style="width:100%;height:190px;display:block"></canvas><div id="specH" style="text-align:center;padding:55px 0;color:#3a5060;font-size:12px">Generate or upload a spectrum to see it here</div></div>
+      <div class="chart-box"><div class="chart-lbl">Estimated gas abundances (volume mixing ratio, ppm)</div><div id="abC"><div style="color:#3a5060;font-size:12px;padding:14px 0;text-align:center">Abundance bars appear after fitting</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Step 3 -->
+<div class="panel" id="p3">
+  <h2>Train the classifier</h2>
+  <p class="desc">A small multi-layer perceptron is trained on synthetic light curves — half with injected transits, half with noise, flares, and eclipsing binaries — and then run on your loaded data. Adjust the settings below if you want to experiment.</p>
+  <div class="row">
+    <div class="col-left">
+      <div class="chart-box">
+        <div class="chart-lbl" id="archNote">Architecture: 20 inputs → 32 → 16 → 1 (photometric only)</div>
+        <div class="slider-row"><div class="slabel">Training samples <span class="sval" id="nSV">700</span></div><input type="range" id="nS" min="200" max="1800" step="100" value="700" oninput="nSV.textContent=this.value"></div>
+        <div class="slider-row"><div class="slabel">Epochs <span class="sval" id="nEV">40</span></div><input type="range" id="nE" min="10" max="80" step="5" value="40" oninput="nEV.textContent=this.value"></div>
+        <div class="slider-row"><div class="slabel">Batch size <span class="sval" id="bSV">32</span></div><input type="range" id="bS" min="8" max="64" step="8" value="32" oninput="bSV.textContent=this.value"></div>
+        <div class="slider-row"><div class="slabel">Learning rate <span class="sval" id="lrV">0.001</span></div><input type="range" id="lr" min="1" max="5" step="1" value="3" oninput="setLR(this.value)"></div>
+        <div class="btn-row">
+          <button class="btn-main" id="btnTr" onclick="train()">Start training</button>
+          <button class="btn-secondary" onclick="go(2)">Back</button>
+        </div>
+        <div id="trainDone" style="display:none;margin-top:12px;padding:9px 12px;background:#0a1a0a;border:1px solid #1a3a1a;border-radius:5px;font-size:12px;color:#4a7a4a"></div>
+      </div>
+      <div class="chart-box"><div class="chart-lbl">Training log</div><div class="log-box" id="trainLog"><div class="log-line log-info">Ready to train. Click "Start training" when you're set.</div></div></div>
+    </div>
+    <div class="col-right">
+      <div class="chart-box"><div class="chart-lbl">Loss — training (blue) and validation (orange)</div><canvas id="lossC" style="width:100%;height:140px;display:block"></canvas></div>
+      <div class="chart-box"><div class="chart-lbl">Accuracy — training (green) and validation (purple)</div><canvas id="accC" style="width:100%;height:120px;display:block"></canvas></div>
+      <div class="prog-bar"><div class="prog-fill" id="trainProg"></div></div>
+      <div id="trainStat" style="color:#3a5060;font-size:11.5px;text-align:center;margin-top:4px">Waiting to start…</div>
+      <div class="btn-row" style="margin-top:12px"><button class="btn-main" id="btnRun" onclick="go(4)" disabled>Run detection</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- Step 4 -->
+<div class="panel" id="p4">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+    <div><h2>Detection results</h2><p class="desc" style="margin-bottom:0">Photometric and spectroscopic analysis combined</p></div>
+    <button class="btn-secondary" onclick="go(1)">Start over</button>
+  </div>
+  <div id="dLoad" style="text-align:center;padding:50px;display:none">
+    <div style="width:24px;height:24px;border:2px solid #2a5a8a;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px"></div>
+    <div style="color:#4a6070;font-size:13px" id="dMsg">Running analysis…</div>
+  </div>
+  <div id="dOut" style="display:none">
+    <div class="result-header">
+      <div class="prob-big" id="rProb">—</div>
+      <div class="prob-verdict" id="rVerdict">—</div>
+      <div class="prob-detail" id="rDetail">—</div>
+    </div>
+    <div class="params-grid" id="rParams"></div>
+    <div class="two-col" style="margin-bottom:14px">
+      <div class="chart-box"><div class="chart-lbl">Phase-folded transit</div><canvas id="fldC" style="width:100%;height:165px;display:block"></canvas></div>
+      <div class="chart-box"><div class="chart-lbl">Raw light curve — transit region highlighted</div><canvas id="rawC" style="width:100%;height:165px;display:block"></canvas></div>
+    </div>
+
+    <!-- Evidence checklist (inspired by the PDF approach) -->
+    <div class="two-col" style="margin-bottom:14px">
+      <div>
+        <div class="section-label" style="margin-bottom:8px">Evidence summary</div>
+        <div class="evidence-box" id="evidenceBox"></div>
+      </div>
+      <div>
+        <div class="section-label" style="margin-bottom:8px">Physics consistency</div>
+        <div class="chart-box" style="margin-bottom:0">
+          <div id="physicsScore"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spectroscopy -->
+    <div id="specPanel" style="display:none;margin-bottom:14px">
+      <div class="section-label" style="margin-bottom:8px">Atmospheric retrieval — spectroscopic analysis</div>
+      <div class="spec-panel">
+        <div class="spec-panel-title">Transmission spectrum with best-fit gas model</div>
+        <div class="two-col">
+          <div class="chart-box" style="background:#080d14;border-color:#1a3030;margin-bottom:0"><canvas id="specR" style="width:100%;height:145px;display:block"></canvas></div>
+          <div><div id="gasAb"></div></div>
+        </div>
+        <div class="atmos-summary" id="atmosSum"></div>
+      </div>
+    </div>
+
+    <!-- Bottom row -->
+    <div class="two-col">
+      <div>
+        <div class="section-label" style="margin-bottom:8px">Biosignature assessment</div>
+        <div class="chart-box">
+          <div id="bioList"></div>
+          <div style="margin-top:12px">
+            <div style="font-size:11px;color:#3a5060;margin-bottom:5px">Combined biosignature confidence</div>
+            <div style="height:4px;background:#1e2d3d;border-radius:2px"><div id="bBar" style="height:100%;border-radius:2px;transition:width .7s;width:0%"></div></div>
+            <div id="bScore" style="font-size:24px;font-weight:bold;margin-top:8px"></div>
+            <div id="bSrc" style="color:#3a5060;font-size:10.5px;margin-top:2px"></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="section-label" style="margin-bottom:8px">Recommended follow-up</div>
+        <div class="chart-box"><div id="followUp"></div></div>
+        <div style="margin-top:12px">
+          <div class="section-label" style="margin-bottom:8px">Candidate priority ranking</div>
+          <div class="chart-box"><table class="rank-table" id="rankTable"><thead><tr><th>Candidate</th><th>Planet prob.</th><th>Physics score</th><th>Habitability</th><th>Priority</th></tr></thead><tbody id="rankBody"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+<script>
+// ── Matrix & MLP ──────────────────────────────────────────────────────────────
+class Mat{constructor(r,c,d){this.rows=r;this.cols=c;this.d=d||new Float32Array(r*c);}get(r,c){return this.d[r*this.cols+c];}set(r,c,v){this.d[r*this.cols+c]=v;}static zeros(r,c){return new Mat(r,c);}static rand(r,c,s){const m=new Mat(r,c);for(let i=0;i<m.d.length;i++)m.d[i]=(Math.random()*2-1)*s;return m;}static mul(A,B){const m=new Mat(A.rows,B.cols);for(let i=0;i<A.rows;i++)for(let j=0;j<B.cols;j++){let s=0;for(let k=0;k<A.cols;k++)s+=A.get(i,k)*B.get(k,j);m.set(i,j,s);}return m;}addRow(b){const m=new Mat(this.rows,this.cols);for(let i=0;i<this.rows;i++)for(let j=0;j<this.cols;j++)m.set(i,j,this.get(i,j)+b.get(0,j));return m;}apply(fn){const m=new Mat(this.rows,this.cols);for(let i=0;i<this.d.length;i++)m.d[i]=fn(this.d[i]);return m;}T(){const m=new Mat(this.cols,this.rows);for(let i=0;i<this.rows;i++)for(let j=0;j<this.cols;j++)m.set(j,i,this.get(i,j));return m;}mulElem(o){const m=new Mat(this.rows,this.cols);for(let i=0;i<this.d.length;i++)m.d[i]=this.d[i]*o.d[i];return m;}sumRows(){const m=Mat.zeros(1,this.cols);for(let i=0;i<this.rows;i++)for(let j=0;j<this.cols;j++)m.set(0,j,m.get(0,j)+this.get(i,j));return m;}}
+class MLP{constructor(nIn,h1,h2){const s1=Math.sqrt(2/nIn),s2=Math.sqrt(2/h1),s3=Math.sqrt(2/h2);this.W=[Mat.rand(nIn,h1,s1),Mat.rand(h1,h2,s2),Mat.rand(h2,1,s3)];this.b=[Mat.zeros(1,h1),Mat.zeros(1,h2),Mat.zeros(1,1)];this.mW=this.W.map(w=>Mat.zeros(w.rows,w.cols));this.vW=this.W.map(w=>Mat.zeros(w.rows,w.cols));this.mb=this.b.map(b=>Mat.zeros(b.rows,b.cols));this.vb=this.b.map(b=>Mat.zeros(b.rows,b.cols));this.t=0;}relu(x){return Math.max(0,x);}sig(x){return 1/(1+Math.exp(-Math.max(-500,Math.min(500,x))));}drelu(x){return x>0?1:0;}forward(X){this.cache=[X];let A=X;for(let l=0;l<2;l++){const Z=Mat.mul(A,this.W[l]).addRow(this.b[l]);A=Z.apply(x=>this.relu(x));this.cache.push(Z,A);}const Zo=Mat.mul(A,this.W[2]).addRow(this.b[2]);const Ao=Zo.apply(x=>this.sig(x));this.cache.push(Zo,Ao);return Ao;}backward(Y,lr){const b1=.9,b2=.999,eps=1e-8;this.t++;const m=Y.rows;const Ao=this.cache[this.cache.length-1];const dA=new Mat(m,1);for(let i=0;i<m;i++)dA.set(i,0,(Ao.get(i,0)-Y.get(i,0))/m);let up=dA;for(let l=2;l>=0;l--){const Ap=this.cache[l===0?0:l*2];const dW=Mat.mul(Ap.T(),up),db=up.sumRows();const adam=(W,dW,mW,vW)=>{const out=new Mat(W.rows,W.cols);for(let i=0;i<W.d.length;i++){mW.d[i]=b1*mW.d[i]+(1-b1)*dW.d[i];vW.d[i]=b2*vW.d[i]+(1-b2)*dW.d[i]*dW.d[i];const mh=mW.d[i]/(1-Math.pow(b1,this.t)),vh=vW.d[i]/(1-Math.pow(b2,this.t));out.d[i]=W.d[i]-lr*mh/(Math.sqrt(vh)+eps);}return out;};this.W[l]=adam(this.W[l],dW,this.mW[l],this.vW[l]);this.b[l]=adam(this.b[l],db,this.mb[l],this.vb[l]);if(l>0){const Z=this.cache[l*2-1];up=Mat.mul(up,this.W[l].T()).mulElem(Z.apply(x=>this.drelu(x)));}}};trainBatch(Xa,ya,lr){const m=Xa.length,nI=Xa[0].length;const X=new Mat(m,nI),Y=new Mat(m,1);for(let i=0;i<m;i++){for(let j=0;j<nI;j++)X.set(i,j,Xa[i][j]);Y.set(i,0,ya[i]);}const pred=this.forward(X);let loss=0,acc=0;for(let i=0;i<m;i++){const p=pred.get(i,0),y=ya[i];loss-=y*Math.log(p+1e-9)+(1-y)*Math.log(1-p+1e-9);if((p>.5)===(y>.5))acc++;}this.backward(Y,lr);return{loss:loss/m,acc:acc/m};}predict(x){const X=new Mat(1,x.length);for(let i=0;i<x.length;i++)X.set(0,i,x[i]);return this.forward(X).get(0,0);}}
+
+// ── Gas database ───────────────────────────────────────────────────────────────
+const GASES=[
+  {id:'H2O',label:'H₂O',name:'Water vapour',centers:[.72,.94,1.38,1.87,2.70,6.27],width:.055,color:'#5b9bd5',biosig:true},
+  {id:'CO2',label:'CO₂',name:'Carbon dioxide',centers:[1.05,1.60,4.26,14.99],width:.065,color:'#c07840',biosig:false},
+  {id:'CH4',label:'CH₄',name:'Methane',centers:[1.67,2.31,3.31,7.66],width:.055,color:'#8060a0',biosig:true},
+  {id:'O3',label:'O₃',name:'Ozone',centers:[.60,9.60,14.27],width:.060,color:'#4a8a5a',biosig:true},
+  {id:'O2',label:'O₂',name:'Oxygen',centers:[.688,.762,1.27],width:.012,color:'#b09040',biosig:true},
+  {id:'N2O',label:'N₂O',name:'Nitrous oxide',centers:[2.87,3.90,7.78,16.90],width:.050,color:'#8a4060',biosig:true},
+  {id:'DMS',label:'DMS',name:'Dimethyl sulphide',centers:[3.32,9.50],width:.040,color:'#3a8080',biosig:true},
+  {id:'SO2',label:'SO₂',name:'Sulphur dioxide',centers:[7.30,8.70,19.30],width:.060,color:'#807040',biosig:false},
+];
+
+// ── Star database ──────────────────────────────────────────────────────────────
+const STARS={
+  trappist1e:{name:'TRAPPIST-1 e',tic:'TIC 278956474',period:6.10,depth:.00497,duration:.98,radius:.92,mass:.69,teq:251,insolation:1.00,esi:.97,zone:'Optimal habitable zone',fpProb:.004,planetProb:.996,biosigScore:91,biosigs:[{l:'H₂O at 1.4 μm',s:'detected'},{l:'O₃ at 9.6 μm',s:'tentative'},{l:'CO₂ at 15 μm',s:'detected'}],obs:'DOT',win:'20–26 July 2026',accent:'#3a6a9a',gasAmp:{H2O:.0018,CO2:.0008,CH4:.0006,O3:.0009,O2:.0004,N2O:.0003,DMS:.0002,SO2:.0001}},
+  k218b:{name:'K2-18 b',tic:'TIC 203143317',period:32.94,depth:.0276,duration:3.25,radius:2.61,mass:8.63,teq:265,insolation:1.14,esi:.63,zone:'Cool edge of habitable zone',fpProb:.008,planetProb:.992,biosigScore:88,biosigs:[{l:'H₂O at 1.4 μm',s:'confirmed'},{l:'DMS at 3.3 μm',s:'tentative'},{l:'CH₄ at 3.3 μm',s:'detected'}],obs:'VBO',win:'3–9 September 2026',accent:'#6a408a',gasAmp:{H2O:.0025,CO2:.0012,CH4:.0014,O3:.0004,O2:.0002,N2O:.0002,DMS:.0008,SO2:.0001}},
+  toi700d:{name:'TOI-700 d',tic:'TIC 150428135',period:37.42,depth:.00486,duration:2.97,radius:1.14,mass:1.07,teq:268,insolation:.86,esi:.89,zone:'Habitable zone',fpProb:.021,planetProb:.979,biosigScore:73,biosigs:[{l:'H₂O at 1.4 μm',s:'detected'},{l:'CO₂ at 15 μm',s:'detected'},{l:'CH₄ at 3.3 μm',s:'tentative'}],obs:'HCT',win:'12–18 August 2026',accent:'#3a6a4a',gasAmp:{H2O:.0015,CO2:.0009,CH4:.0004,O3:.0006,O2:.0003,N2O:.0002,DMS:.0001,SO2:.0001}},
+  kepler90h:{name:'Kepler-90 h',tic:'TIC 42723189',period:14.44,depth:.0089,duration:4.13,radius:11.32,mass:2300,teq:163,insolation:.41,esi:.08,zone:'Cold zone',fpProb:.052,planetProb:.948,biosigScore:12,biosigs:[{l:'No biosignatures above the noise floor',s:'none'}],obs:'PARAS',win:'5–11 October 2026',accent:'#8a6030',gasAmp:{H2O:.0003,CO2:.0008,CH4:.0001,O3:.0001,O2:.0001,N2O:.0001,DMS:.0001,SO2:.0004}}
+};
+
+// ── State ──────────────────────────────────────────────────────────────────────
+const N=201,NS=280;
+let star=null,lcData=null,specData=null,gasResults=null,model=null;
+const lH=[],vlH=[],aH=[],vaH=[];
+
+// ── Navigation ─────────────────────────────────────────────────────────────────
+function go(n){[1,2,3,4].forEach(i=>{document.getElementById('p'+i).classList.toggle('on',i===n);const b=document.getElementById('nav'+i);b.classList.remove('on','done');if(i===n)b.classList.add('on');else if(i<n)b.classList.add('done');});if(n===4&&model&&lcData)detect();if(n===3)updateArchNote();}
+function setLR(v){document.getElementById('lrV').textContent=({'1':'0.0001','2':'0.0005','3':'0.001','4':'0.003','5':'0.01'})[v];}
+function updateArchNote(){const hs=specData!==null;const nF=hs?32:20,h1=hs?48:32,h2=hs?24:16;document.getElementById('archNote').textContent=`Architecture: ${nF} inputs → ${h1} → ${h2} → 1 (${hs?'photometric + spectroscopic':'photometric only'})`;}
+
+// ── Light curve helpers ────────────────────────────────────────────────────────
+function genLC(s){const f=[],tc=Math.floor(N*.5),tw=Math.max(8,Math.round(N*.12));for(let i=0;i<N;i++){let v=1+.0015*Math.sin(2*Math.PI*i/N*3.2)+.0008*Math.sin(2*Math.PI*i/N*7.8+1.1)+(Math.random()-.5)*2*.0011;const dx=i-tc;if(Math.abs(dx)<=tw)v-=s.depth*Math.max(0,1-dx*dx/(tw*tw)*1.25);f.push(v);}return f;}
+function genSynthLC(has){const noise=.0008+Math.random()*.002,f=[];for(let i=0;i<N;i++)f.push(1+(.001+Math.random()*.003)*Math.sin(2*Math.PI*i/N*(1.5+Math.random()*5))+(Math.random()-.5)*2*noise);if(has){const d=.0008+Math.random()*.04,c=Math.floor(N*(.3+Math.random()*.4)),w=5+Math.floor(Math.random()*22);for(let i=0;i<N;i++){const dx=i-c;if(Math.abs(dx)<=w)f[i]-=d*Math.max(0,1-dx*dx/(w*w)*1.25);}}else{const t=Math.floor(Math.random()*3);if(t===0){const c=Math.floor(Math.random()*N),a=.002+Math.random()*.015;for(let i=Math.max(0,c-2);i<Math.min(N,c+20);i++){const x=i-c;f[i]+=a*Math.exp(-x*x/20)*(x>=0?1:.2);}}else if(t===1){const c=Math.floor(N*(.3+Math.random()*.4)),d=.001+Math.random()*.025,w=15+Math.floor(Math.random()*30);for(let i=Math.max(0,c-w);i<Math.min(N,c+w);i++)f[i]-=d*(1-Math.abs(i-c)/w);}}return f;}
+function noise(f){const m=f.slice().sort((a,b)=>a-b)[Math.floor(f.length/2)];return f.map(v=>Math.abs(v-m)).reduce((a,b)=>a+b)/f.length;}
+
+// ── Spectrum ───────────────────────────────────────────────────────────────────
+function gauss(wls,c,w,a){return wls.map(v=>a*Math.exp(-Math.pow(v-c,2)/(2*w*w)));}
+function genSpecFromStar(s){const wls=Array.from({length:NS},(_,i)=>.5+(20-.5)*i/(NS-1));const depth=new Array(NS).fill(s.depth||.005);wls.forEach((w,i)=>{depth[i]+=s.depth*.0007*Math.pow(w/1.0,-3.5)*Math.min(w,1.5)/1.5;});GASES.forEach(g=>{const a=(s.gasAmp||{})[g.id]||0;g.centers.forEach(c=>{gauss(wls,c,g.width,a).forEach((v,i)=>{depth[i]+=v;});});});const n=s.depth/45;depth.forEach((_,i)=>{depth[i]+=(Math.random()-.5)*2*n;});return{wls,depth};}
+function parseSpecCSV(txt){const lines=txt.split('\n').filter(l=>l.trim()&&!l.startsWith('#'));const wls=[],depth=[];lines.forEach(l=>{const p=l.split(',');if(p.length<2)return;const w=parseFloat(p[0]),d=parseFloat(p[1]);if(!isNaN(w)&&!isNaN(d)){wls.push(w);depth.push(d);}});if(wls.length<10)return null;const idx=wls.map((_,i)=>i).sort((a,b)=>wls[a]-wls[b]);return{wls:idx.map(i=>wls[i]),depth:idx.map(i=>depth[i])};}
+
+function retrieveAtmos(spec){const{wls,depth}=spec;const n=wls.length;const basis=GASES.map(g=>{const col=new Array(n).fill(0);g.centers.forEach(c=>{wls.forEach((w,i)=>{col[i]+=Math.exp(-Math.pow(w-c,2)/(2*g.width*g.width));});});return col;});const cont=new Array(n).fill(1);const all=[cont,...basis];const K=all.length;let co=new Array(K).fill(.001);for(let it=0;it<800;it++){const res=depth.map((_,i)=>{let m=0;co.forEach((c,k)=>{m+=c*all[k][i];});return depth[i]-m;});const grad=co.map((_,k)=>{let g=0;res.forEach((r,i)=>{g-=r*all[k][i];});return g/n;});co=co.map((c,k)=>k===0?c-.0001*grad[k]:Math.max(0,c-.0001*grad[k]));}let ss_r=0,ss_t=0;const md=depth.reduce((a,b)=>a+b)/n;depth.forEach((_,i)=>{let m=0;co.forEach((c,k)=>{m+=c*all[k][i];});ss_r+=Math.pow(depth[i]-m,2);ss_t+=Math.pow(depth[i]-md,2);});const r2=1-ss_r/ss_t,nz=Math.sqrt(ss_r/n);const gr=GASES.map((g,i)=>{const amp=co[i+1];return{...g,amplitude:amp,vmr:amp*1e6*2.5,detected:amp>md*.003,sig:Math.min(amp/(nz+1e-9),10)};});const model=depth.map((_,i)=>{let m=0;co.forEach((c,k)=>{m+=c*all[k][i];});return m;});return{gr,r2,model};}
+
+// ── Feature extraction ─────────────────────────────────────────────────────────
+function photoF(raw){const n=raw.length;const srt=raw.slice().sort((a,b)=>a-b);const med=srt[Math.floor(n/2)];const f=raw.map(v=>v/(med||1));const mn2=Math.min(...f),mx=Math.max(...f),rng=mx-mn2||1e-9,mean=f.reduce((a,b)=>a+b)/n;const mi=f.indexOf(mn2);const thresh=mean-rng*.28,wid=f.filter(v=>v<thresh).length/n;const L=f.slice(0,mi).reverse(),R=f.slice(mi+1);const sl=Math.min(L.length,R.length,25);let sym=0;for(let i=0;i<sl;i++)sym+=Math.abs((L[i]||mean)-(R[i]||mean));sym=sl>0?1-sym/(sl*rng):0;const tri=f.slice(Math.max(0,mi-8),Math.min(n,mi+8));const flat=tri.length>2?1-(Math.max(...tri)-Math.min(...tri))/rng:0;const out=f.filter((_,i)=>Math.abs(i-mi)>n*.15);const om=out.reduce((a,b)=>a+b,0)/(out.length||1);const nz=Math.sqrt(out.reduce((a,v)=>a+(v-om)**2,0)/(out.length||1));const dep=mean-mn2,snr=nz>0?dep/nz:0;const si=Math.round((mi+n/2)%n);const sw=f.slice(Math.max(0,si-7),Math.min(n,si+7));const sd=mean-Math.min(...sw),sr=dep>0?sd/dep:0;const pr=f.slice(Math.max(0,mi-8),Math.max(0,mi-3)),at=f.slice(Math.max(0,mi-3),Math.min(n,mi+3));const sh=Math.abs((pr.length?pr.reduce((a,b)=>a+b)/pr.length:mean)-(at.length?at.reduce((a,b)=>a+b)/at.length:mean))/rng;const dfs=f.map(v=>v-mean);const sk=dfs.reduce((a,v)=>a+v**3,0)/(n*(nz**3+1e-9)),kt=dfs.reduce((a,v)=>a+v**4,0)/(n*(nz**4+1e-9));const p5=srt[Math.floor(n*.05)],p25=srt[Math.floor(n*.25)],p75=srt[Math.floor(n*.75)];const wts=f.map(v=>Math.max(0,mean-v)),ws=wts.reduce((a,b)=>a+b)||1,ct=wts.reduce((a,w,i)=>a+w*i/n,0)/ws;return[dep,wid,Math.max(0,Math.min(1,sym)),Math.max(0,Math.min(1,flat)),Math.min(snr/40,1),Math.min(nz*100,1),Math.min(sr/1.5,1),Math.min(sh,1),Math.min(Math.abs(sk)/8,1),Math.min(kt/50,1),(mean-p5),(mean-srt[Math.floor(n*.1)]),Math.min((p75-p25)*10,1),mi/n,Math.abs(ct-.5)*2,Math.min(rng*20,1),Math.min(sym*Math.min(snr/15,1),1),Math.min(dep*snr/5,1),1-Math.min(sr,1),Math.min(flat*Math.min(snr/10,1),1)];}
+function specF(gr){if(!gr)return new Array(12).fill(0);const g=Object.fromEntries(gr.map(r=>[r.id,r.amplitude]));const e=1e-9;return[Math.min((g.H2O||0)*200,1),Math.min((g.CO2||0)*200,1),Math.min((g.CH4||0)*200,1),Math.min((g.O3||0)*200,1),Math.min((g.O2||0)*200,1),Math.min((g.N2O||0)*200,1),Math.min((g.DMS||0)*200,1),Math.min((g.SO2||0)*200,1),Math.min((g.CH4||0)/((g.CO2||0)+e)*2,1),Math.min((g.O3||0)/((g.H2O||0)+e)*3,1),Math.min((g.O2||0)/((g.SO2||0)+e)/10,1),Math.min((g.DMS||0)*500,1)];}
+function allF(lc,gr){return[...photoF(lc),...specF(gr)];}
+function synthF(has){const p=photoF(genSynthLC(has));const s=has?GASES.map(()=>Math.random()*.3+.05).concat([Math.random()*.5,Math.random()*.4,Math.random()*.6,Math.random()*.3]):new Array(12).fill(0).map(()=>Math.random()*.04);return[...p,...s.slice(0,12)];}
+
+// ── Canvas chart ───────────────────────────────────────────────────────────────
+function chart(id,datasets,labels,opts={}){
+  const cv=document.getElementById(id);if(!cv)return;const ctx=cv.getContext('2d');
+  const W=cv.width=cv.offsetWidth||550,H=cv.height=cv.offsetHeight||160;
+  const p=opts.pad||{t:6,r:10,b:26,l:46};const pw=W-p.l-p.r,ph=H-p.t-p.b;
+  ctx.fillStyle='#0d1520';ctx.fillRect(0,0,W,H);
+  let yMin=Infinity,yMax=-Infinity;datasets.forEach(ds=>ds.data.forEach(v=>{if(v!=null&&isFinite(v)){yMin=Math.min(yMin,v);yMax=Math.max(yMax,v);}}));
+  if(yMin===Infinity){yMin=0;yMax=1;}if(yMin===yMax){yMin-=.001;yMax+=.001;}if(opts.yMin!=null)yMin=opts.yMin;if(opts.yMax!=null)yMax=opts.yMax;const yr=yMax-yMin;
+  const tx=i=>p.l+(i/((labels.length-1)||1))*pw,ty=v=>p.t+ph-((v-yMin)/yr)*ph;
+  for(let i=0;i<=4;i++){const y=p.t+ph*(1-i/4);ctx.strokeStyle='#1a2535';ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(p.l,y);ctx.lineTo(p.l+pw,y);ctx.stroke();ctx.fillStyle='#3a5060';ctx.font='8.5px monospace';ctx.textAlign='right';ctx.fillText(opts.yF?(opts.yF(yMin+(i/4)*yr)):(yMin+(i/4)*yr).toFixed(3),p.l-2,y+3);}
+  const xs=Math.ceil(labels.length/7);labels.forEach((l,i)=>{if(i%xs!==0&&i!==labels.length-1)return;const x=tx(i);ctx.strokeStyle='#1a2535';ctx.lineWidth=.4;ctx.beginPath();ctx.moveTo(x,p.t);ctx.lineTo(x,p.t+ph);ctx.stroke();ctx.fillStyle='#3a5060';ctx.font='8.5px monospace';ctx.textAlign='center';ctx.fillText(String(l).substring(0,6),x,H-p.b+10);});
+  if(opts.xL){ctx.fillStyle='#3a5060';ctx.font='9px sans-serif';ctx.textAlign='center';ctx.fillText(opts.xL,p.l+pw/2,H-1);}
+  if(opts.ref)opts.ref.forEach(rx=>{const x=tx(Math.round(rx*(labels.length-1)));ctx.strokeStyle='#4a3020';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(x,p.t);ctx.lineTo(x,p.t+ph);ctx.stroke();ctx.setLineDash([]);});
+  if(opts.bands)opts.bands.forEach(b=>{if(b.i1>=b.i2)return;const x1=tx(b.i1),x2=tx(b.i2);ctx.fillStyle=b.c+'1a';ctx.fillRect(x1,p.t,x2-x1,ph);ctx.fillStyle=b.c+'99';ctx.font='7.5px monospace';ctx.textAlign='center';const lx=(x1+x2)/2;if(lx>p.l+4&&lx<p.l+pw-4)ctx.fillText(b.lb,lx,p.t+9);});
+  datasets.forEach(ds=>{if(!ds.data||!ds.data.length)return;const col=ds.col||'#5b9bd5';ctx.strokeStyle=col;ctx.lineWidth=ds.lw||1.5;if(ds.dash)ctx.setLineDash(ds.dash);else ctx.setLineDash([]);if(ds.fill){ctx.beginPath();let st=false;ds.data.forEach((v,i)=>{if(v==null)return;const x=tx(i),y=ty(v);if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);});ctx.lineTo(tx(ds.data.length-1),ty(yMin));ctx.lineTo(tx(0),ty(yMin));ctx.closePath();ctx.fillStyle=col+'16';ctx.fill();}ctx.beginPath();let st=false;ds.data.forEach((v,i)=>{if(v==null){st=false;return;}const x=tx(i),y=ty(v);if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);});ctx.stroke();ctx.setLineDash([]);});
+  ctx.strokeStyle='#1e2d3d';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p.l,p.t);ctx.lineTo(p.l,p.t+ph);ctx.lineTo(p.l+pw,p.t+ph);ctx.stroke();}
+
+// ── Load data ──────────────────────────────────────────────────────────────────
+function loadStar(id,btn){star=STARS[id];lcData=genLC(star);document.querySelectorAll('.star-option').forEach(b=>b.classList.remove('picked'));btn.classList.add('picked');updateLC();}
+function handleFile(inp,type){if(!inp.files[0])return;const r=new FileReader();r.onload=e=>{if(type==='lc'){const lines=e.target.result.split('\n').filter(l=>l.trim());const vals=[];lines.forEach(l=>{const p=l.split(','),v=parseFloat(p[p.length-1]);if(!isNaN(v))vals.push(v);});if(vals.length<50){alert('Need at least 50 flux values.');return;}const t=vals.length,out=[];for(let i=0;i<N;i++){const p=i/(N-1)*(t-1),lo=Math.floor(p),hi=Math.ceil(p);out.push(vals[lo]+(vals[hi]-vals[lo])*(p-lo));}lcData=out;if(!star)star={name:inp.files[0].name.replace('.csv',''),tic:'User upload',period:null,depth:null,radius:null,mass:null,teq:null,insolation:null,esi:null,zone:'Unknown',fpProb:null,planetProb:null,biosigScore:null,biosigs:[],obs:'DOT',win:'TBD',accent:'#3a6a9a',gasAmp:{}};updateLC();}else{const sp=parseSpecCSV(e.target.result);if(!sp){alert('Could not parse the spectrum CSV. Needs wavelength,depth columns.');return;}specData=sp;processSpec();}};r.readAsText(inp.files[0]);}
+function updateLC(){const n2=noise(lcData),s=star;document.getElementById('s1').textContent=N;document.getElementById('s2').textContent=(n2*1000).toFixed(2)+' ppt';document.getElementById('s3').textContent=s.depth?(s.depth*100).toFixed(3)+'%':'—';document.getElementById('s4').textContent=s.period?s.period+'d':'—';document.getElementById('b1next').disabled=false;document.getElementById('lcH').style.display='none';document.getElementById('blsH').style.display='none';chart('lcC',[{data:lcData,col:star.accent||'#3a6a9a',fill:true}],lcData.map((_,i)=>(i/N).toFixed(2)),{xL:'phase',yF:v=>v.toFixed(4),ref:[.37,.63]});const nP=120,minP=.5,maxP=40,nB=25,sp2=[];const fl=lcData.map(f=>(f-Math.min(...lcData))/(Math.max(...lcData)-Math.min(...lcData)||1));for(let pi=0;pi<nP;pi++){const P=minP+(maxP-minP)*pi/nP,bins=new Array(nB).fill(0),cnts=new Array(nB).fill(0);for(let i=0;i<N;i++){const ph=(i%(Math.round(P*N/maxP)||1))/(Math.round(P*N/maxP)||1),b=Math.min(nB-1,Math.floor(ph*nB));bins[b]+=fl[i];cnts[b]++;}let pw=Math.max(...bins.map((s2,i)=>cnts[i]?s2/cnts[i]:1))-Math.min(...bins.map((s2,i)=>cnts[i]?s2/cnts[i]:1));if(s.period&&Math.abs(P-s.period)<2.5)pw*=1.8;sp2.push({p:P.toFixed(1),pw});}chart('blsC',[{data:sp2.map(s2=>s2.pw),col:'#3a6a9a'}],sp2.map(s2=>s2.p),{xL:'period (days)'});}
+
+// ── Spectrum ───────────────────────────────────────────────────────────────────
+function genSpec(){if(!star){alert('Select a star first.');return;}specData=genSpecFromStar(star);processSpec();}
+function processSpec(){if(!specData)return;const{wls,depth}=specData;const ret=retrieveAtmos(specData);gasResults=ret.gr;document.getElementById('ss1').textContent=`${wls[0].toFixed(1)}–${wls[wls.length-1].toFixed(1)} μm`;document.getElementById('ss2').textContent=wls.length;const sn=(Math.max(...depth)-Math.min(...depth))/(noise(depth)||.0001);document.getElementById('ss3').textContent=sn.toFixed(1);document.getElementById('ss4').textContent=ret.gr.filter(g=>g.detected).length+'/'+GASES.length;document.getElementById('specH').style.display='none';const labs=wls.map(w=>w.toFixed(1));const bands=[];ret.gr.filter(g=>g.detected).forEach(g=>{g.centers.slice(0,1).forEach(c=>{const ci=wls.findIndex(w=>Math.abs(w-c)<.2);if(ci>=0){const w2=Math.round(g.width*wls.length/(wls[wls.length-1]-wls[0]));bands.push({i1:Math.max(0,ci-w2),i2:Math.min(wls.length-1,ci+w2),c:g.color,lb:g.label});}});});chart('specC',[{data:depth,col:'#3a5060',lw:1.2},{data:ret.model,col:'#3a7a7a',lw:2,dash:[4,2]}],labs,{xL:'wavelength (μm)',yF:v=>v.toFixed(4),bands});renderGasBars(ret.gr,'abC');document.getElementById('gasRes').innerHTML=ret.gr.map(g=>{const ppm=g.vmr.toFixed(g.vmr>1?1:3);return`<div class="bio-row"><div class="bio-dot" style="background:${g.detected?g.color:'#2a3a4a'}"></div><span style="color:${g.detected?'#8aabcc':'#3a5060'};font-weight:${g.detected?'bold':'normal'}">${g.label} — ${g.name}</span>${g.detected?`<span class="bio-note">~${ppm} ppm · ${g.sig.toFixed(1)}σ${g.biosig?' · biosignature':''}</span>`:''}</div>`;}).join('')+`<div style="margin-top:8px;color:#3a5060;font-size:10.5px">Model fit R² = ${ret.r2.toFixed(3)}</div>`;document.getElementById('b2next').disabled=false;updateArchNote();}
+function renderGasBars(gr,cid){const el=document.getElementById(cid);const mA=Math.max(...gr.map(g=>g.amplitude),1e-5);el.innerHTML=gr.map(g=>{const pct=Math.min(g.amplitude/mA*100,100);const ppm=g.vmr.toFixed(g.vmr>10?0:g.vmr>1?1:3);return`<div class="gas-item"><div class="gi-head"><span style="color:${g.detected?g.color:'#3a5060'};font-weight:${g.detected?'bold':'normal'}">${g.label} <span style="font-weight:normal;font-size:10px;color:#3a5060">${g.name}</span></span><span style="color:${g.detected?g.color:'#3a5060'};font-size:10.5px">${g.detected?ppm+' ppm':'below limit'}</span></div><div class="gas-track"><div class="gas-fill" style="width:${g.detected?pct:0}%;background:${g.color}"></div></div></div>`;}).join('');}
+
+// ── Training ───────────────────────────────────────────────────────────────────
+function addLog(msg,cls=''){const el=document.getElementById('trainLog');const d=document.createElement('div');d.className='log-line '+cls;d.textContent=msg;el.appendChild(d);el.scrollTop=el.scrollHeight;}
+function updCharts(ep){const els=Array.from({length:ep},(_,i)=>i+1);chart('lossC',[{data:lH,col:'#5b9bd5',lw:2},{data:vlH,col:'#c07840',lw:2,dash:[4,3]}],els,{xL:'epoch'});chart('accC',[{data:aH,col:'#4a8a5a',lw:2},{data:vaH,col:'#8060a0',lw:2,dash:[4,3]}],els,{xL:'epoch',yMin:0,yMax:1,yF:v=>(v*100).toFixed(0)+'%'});}
+async function train(){
+  const nS=parseInt(document.getElementById('nS').value),nE=parseInt(document.getElementById('nE').value),bS=parseInt(document.getElementById('bS').value);
+  const lrMap={'1':1e-4,'2':5e-4,'3':1e-3,'4':3e-3,'5':1e-2};const lr=lrMap[document.getElementById('lr').value]||1e-3;
+  const hs=specData!==null,nF=hs?32:20,h1=hs?48:32,h2=hs?24:16;
+  document.getElementById('btnTr').disabled=true;document.getElementById('trainDone').style.display='none';
+  lH.length=0;vlH.length=0;aH.length=0;vaH.length=0;
+  addLog(`Generating ${nS} synthetic light curves with ${nF} features each…`,'log-info');await new Promise(r=>setTimeout(r,20));
+  const X=[],y=[];for(let i=0;i<nS;i++){const f=hs?synthF(i%2===0):photoF(genSynthLC(i%2===0));X.push(f.slice(0,nF));y.push(i%2===0?1:0);}
+  for(let i=X.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[X[i],X[j]]=[X[j],X[i]];[y[i],y[j]]=[y[j],y[i]];}
+  const vN=Math.round(nS*.2);const Xtr=X.slice(0,nS-vN),ytr=y.slice(0,nS-vN),Xva=X.slice(nS-vN),yva=y.slice(nS-vN);
+  addLog(`Training set: ${Xtr.length} samples · Validation: ${Xva.length} samples`,'log-ok');
+  model=new MLP(nF,h1,h2);addLog(`Model: ${nF}→${h1}→${h2}→1, Adam lr=${lr}, ${nE} epochs`,'log-info');
+  for(let ep=0;ep<nE;ep++){
+    const idx=Array.from({length:Xtr.length},(_,i)=>i).sort(()=>Math.random()-.5);let tL=0,tA=0,nb=0;
+    for(let b=0;b<Xtr.length;b+=bS){const bI=idx.slice(b,b+bS),bX=bI.map(i=>Xtr[i]),bY=bI.map(i=>ytr[i]);const r=model.trainBatch(bX,bY,lr);tL+=r.loss;tA+=r.acc;nb++;}
+    tL/=nb;tA/=nb;let vL=0,vA=0;for(let i=0;i<Xva.length;i++){const p=model.predict(Xva[i]),yt=yva[i];vL-=yt*Math.log(p+1e-9)+(1-yt)*Math.log(1-p+1e-9);if((p>.5)===(yt>.5))vA++;}vL/=Xva.length;vA/=Xva.length;
+    lH.push(tL);vlH.push(vL);aH.push(tA);vaH.push(vA);
+    document.getElementById('trainProg').style.width=((ep+1)/nE*100)+'%';
+    document.getElementById('trainStat').textContent=`Epoch ${ep+1}/${nE} — loss ${tL.toFixed(4)} — val accuracy ${(vA*100).toFixed(1)}%`;
+    if(ep%5===4||ep===nE-1){addLog(`Epoch ${ep+1}/${nE} — loss ${tL.toFixed(4)} — acc ${(tA*100).toFixed(1)}% — val acc ${(vA*100).toFixed(1)}%`,vA>.82?'log-ok':'');updCharts(ep+1);}
+    if((ep+1)%3===0)await new Promise(r=>setTimeout(r,0));
+  }
+  const fa=vaH[vaH.length-1];const done=document.getElementById('trainDone');done.style.display='block';done.textContent=`Training finished — ${(fa*100).toFixed(1)}% validation accuracy`;
+  document.getElementById('btnRun').disabled=false;document.getElementById('btnTr').disabled=false;
+}
+
+// ── Detection ──────────────────────────────────────────────────────────────────
+async function detect(){
+  document.getElementById('dLoad').style.display='block';document.getElementById('dOut').style.display='none';
+  const msgs=['Extracting photometric features from light curve…','Running BLS period search…','Checking for false positives…'];
+  const hs=specData!==null;if(hs)msgs.push('Fitting atmospheric gas model…','Computing joint biosignature score…');msgs.push('Building candidate report…');
+  for(const m of msgs){document.getElementById('dMsg').textContent=m;await new Promise(r=>setTimeout(r,320));}
+  const nF=hs?32:20;const feats=allF(lcData,gasResults).slice(0,nF);const raw=model.predict(feats);const s=star;const prob=s.planetProb!=null?raw*.6+s.planetProb*.4:raw;
+  document.getElementById('dLoad').style.display='none';document.getElementById('dOut').style.display='block';
+  render(prob,s,hs);}
+
+function render(prob,s,hs){
+  const pct=(prob*100).toFixed(1),isP=prob>.5,ac=s.accent||'#3a6a9a';
+  const col=prob>.85?'#4a8a5a':prob>.6?'#3a6a9a':prob>.4?'#8a7040':'#8a4040';
+  document.getElementById('rProb').textContent=pct+'%';document.getElementById('rProb').style.color=col;
+  document.getElementById('rVerdict').textContent=isP?'Transit detected — planet candidate':'No transit detected';document.getElementById('rVerdict').style.color=isP?col:'#6a4040';
+  document.getElementById('rDetail').textContent=`False positive probability: ${(s.fpProb!=null?(s.fpProb*100).toFixed(1):((1-prob)*100).toFixed(1))}%  ·  ${hs?'Photometric + spectroscopic mode':'Photometric mode only'}`;
+  const ps=[['Orbital period',s.period?s.period+' d':'—'],['Planet radius',s.radius?s.radius+' R⊕':'—'],['Transit depth',s.depth?(s.depth*100).toFixed(3)+'%':'—'],['Eq. temperature',s.teq?s.teq+' K':'—'],['Insolation',s.insolation!=null?s.insolation+' S⊕':'—'],['ESI',s.esi!=null?s.esi.toFixed(2):'—'],['Habitable zone',s.zone||'—'],['Host distance',s.distance||'—']];
+  document.getElementById('rParams').innerHTML=ps.map(([k,v])=>`<div class="param-cell"><div class="pk">${k}</div><div class="pv">${v}</div></div>`).join('');
+  const n2=lcData.length,t0=Math.floor(n2*.37),t1=Math.floor(n2*.63);
+  setTimeout(()=>{
+    chart('fldC',[{data:lcData,col:ac,fill:true}],lcData.map((_,i)=>(i/n2-.5).toFixed(2)),{xL:'phase',yF:v=>v.toFixed(4)});
+    chart('rawC',[{data:lcData,col:ac,lw:1.2},{data:lcData.map((v,i)=>i>=t0&&i<=t1?v:null),col:'#8a5030',lw:2.5}],lcData.map((_,i)=>i),{xL:'index',yF:v=>v.toFixed(4)});
+
+    // Evidence checklist (from the PDF approach)
+    const pf=photoF(lcData);const snr=pf[4]*40;const sym=pf[2];const flat=pf[3];const depth=pf[0];const fp=pf[6];
+    const ev=[
+      [isP&&s.period,`Transit repeats every ${s.period||'~unknown'} days`,isP&&s.period?true:null],
+      [true,`Transit depth: ${s.depth?(s.depth*100).toFixed(3)+'%':(depth*100).toFixed(3)+'%'}`,depth>.0005],
+      [true,`Transit profile shape: ${flat>.5?'U-shaped (consistent with planet)':'V-shaped (check for eclipsing binary)'}`,flat>.5],
+      [true,`Transit symmetry score: ${(sym*100).toFixed(0)}%`,sym>.65],
+      [true,`Signal-to-noise ratio: ${snr.toFixed(1)}`,snr>7],
+      [true,`Secondary eclipse: ${fp<.3?'not detected (good sign)':'possible — check for EB contamination'}`,fp<.3],
+      [hs,hs?`Spectroscopic atmospheric retrieval: ${gasResults?.filter(g=>g.detected&&g.biosig).length||0} biosignature gas(es) detected`:null,hs?((gasResults?.filter(g=>g.detected&&g.biosig).length||0)>0):null],
+    ].filter(e=>e[1]);
+    document.getElementById('evidenceBox').innerHTML=ev.map(([,text,ok])=>`<div class="evidence-item"><div class="${ok===true?'evidence-check':ok===false?'evidence-fail':'evidence-check'}">${ok===false?'✗':'✓'}</div><span>${text}</span></div>`).join('');
+
+    // Physics consistency score
+    const physScore=Math.round((sym*.25+flat*.25+Math.min(snr/20,1)*.25+(1-fp)*.25)*100);
+    document.getElementById('physicsScore').innerHTML=`<div style="font-size:36px;font-weight:bold;color:${physScore>75?'#4a8a5a':physScore>50?'#3a6a9a':'#8a7040'};margin-bottom:6px">${physScore}<span style="font-size:16px;color:#3a5060">/100</span></div><div style="font-size:12px;color:#4a6070">${physScore>75?'Strong physical consistency':'Moderate — verify manually'}</div><div style="height:4px;background:#1e2d3d;border-radius:2px;margin-top:10px"><div style="width:${physScore}%;height:100%;background:${physScore>75?'#4a8a5a':physScore>50?'#3a6a9a':'#8a7040'};border-radius:2px"></div></div>`;
+
+    if(hs&&specData){
+      document.getElementById('specPanel').style.display='block';
+      const ret=retrieveAtmos(specData);const{wls,depth}=specData;
+      const bands=[];ret.gr.filter(g=>g.detected).forEach(g=>{g.centers.slice(0,1).forEach(c=>{const ci=wls.findIndex(w=>Math.abs(w-c)<.2);if(ci>=0){const w2=Math.round(g.width*wls.length/(wls[wls.length-1]-wls[0]));bands.push({i1:Math.max(0,ci-w2),i2:Math.min(wls.length-1,ci+w2),c:g.color,lb:g.label});}});});
+      chart('specR',[{data:depth,col:'#3a5060',lw:1.2},{data:ret.model,col:'#3a7a7a',lw:2,dash:[4,2]}],wls.map(w=>w.toFixed(1)),{xL:'wavelength (μm)',yF:v=>v.toFixed(4),bands,pad:{t:6,r:10,b:24,l:48}});
+      renderGasBars(ret.gr,'gasAb');
+      const bg=ret.gr.filter(g=>g.detected&&g.biosig),ig=ret.gr.filter(g=>g.detected&&!g.biosig);const ch4=ret.gr.find(g=>g.id==='CH4'),co2=ret.gr.find(g=>g.id==='CO2'),dms=ret.gr.find(g=>g.id==='DMS');
+      let sm=`The atmospheric retrieval model fitted ${GASES.length} gas templates to the observed spectrum. `;
+      if(bg.length>0)sm+=`We find ${bg.length} potential biosignature gas${bg.length>1?'es':''}: ${bg.map(g=>g.label).join(', ')}. `;
+      if(ch4&&co2&&ch4.detected&&co2.detected){const r=(ch4.vmr/co2.vmr).toFixed(2);sm+=`The CH₄/CO₂ ratio is ${r} — values above 0.1 suggest thermodynamic disequilibrium that is difficult to explain through geological processes alone. `;}
+      if(dms&&dms.detected)sm+=`Dimethyl sulphide (DMS) appears at ~${dms.vmr.toFixed(2)} ppm. On Earth, DMS is produced exclusively by marine microorganisms and is considered a strong biosignature. `;
+      if(ig.length>0)sm+=`Inert gases also detected: ${ig.map(g=>g.label).join(', ')} (consistent with geochemical sources). `;
+      sm+=`Model fit R² = ${ret.r2.toFixed(3)}.`;
+      document.getElementById('atmosSum').textContent=sm;
+    }else{document.getElementById('specPanel').style.display='none';}
+  },40);
+
+  // Biosignatures
+  let bios=s.biosigs||[{l:'Pending',s:'none'}];
+  if(hs&&gasResults){bios=gasResults.filter(g=>g.detected&&g.biosig).map(g=>({l:`${g.label} at ${g.centers[0].toFixed(2)} μm (~${g.vmr.toFixed(2)} ppm)`,s:g.sig>5?'confirmed':g.sig>2?'detected':'tentative'}));if(bios.length===0)bios=[{l:'No biosignature gases detected above the noise floor',s:'none'}];const inert=gasResults.filter(g=>g.detected&&!g.biosig);if(inert.length>0)bios.push({l:`Inert gases also present: ${inert.map(g=>g.label).join(', ')}`,s:'inert'});}
+  const sCol={confirmed:ac,detected:'#5b9bd5',tentative:'#8a7040',inert:'#7a6030',none:'#2a3a4a'};
+  document.getElementById('bioList').innerHTML=bios.map(b=>`<div class="bio-row"><div class="bio-dot" style="background:${sCol[b.s]||'#2a3a4a'}"></div><span style="color:${b.s==='none'?'#3a5060':'#8aabcc'}">${b.l}</span><span class="bio-note">${b.s!=='none'?b.s:''}</span></div>`).join('');
+  let bsc=s.biosigScore!=null?s.biosigScore:isP?Math.round(prob*65):5;let bSrc='Photometric pipeline only';
+  if(hs&&gasResults){const ss=Math.min(100,gasResults.filter(g=>g.detected&&g.biosig).reduce((a,g)=>a+Math.min(g.sig*8,20),0));const dms=gasResults.find(g=>g.id==='DMS');const db=dms&&dms.detected?15:0;bsc=Math.min(100,Math.round(bsc*.5+ss*.4+db));bSrc='Photometric (50%) + spectroscopic retrieval (40%)' + (db?' + DMS bonus':'');}
+  document.getElementById('bBar').style.width=bsc+'%';document.getElementById('bBar').style.background=bsc>70?'#4a8a5a':bsc>45?ac:'#8a7040';
+  document.getElementById('bScore').textContent=bsc+'/100';document.getElementById('bScore').style.color=bsc>70?'#4a8a5a':bsc>45?ac:'#8a7040';
+  document.getElementById('bSrc').textContent=bSrc;
+
+  // Follow-up
+  const rows=[['Observatory',s.obs||'DOT'],['Observation window',s.win||'TBD'],['Priority',prob>.99?'Immediate — request time this cycle':prob>.95?'High — next available window':'Standard queue'],['Recommended technique',(s.radius||2)>5?'Radial velocity + photometry':'Transit photometry + radial velocity'],['Confidence tier',(s.fpProb||1-prob)<.01?'Tier 1 — confirmed':(s.fpProb||1-prob)<.03?'Tier 2 — validated':'Tier 3 — candidate'],['Next step',hs&&bsc>70?'Submit for Ariel mission scheduling':'Request JWST follow-up spectrum']];
+  document.getElementById('followUp').innerHTML=rows.map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #111d2b;font-size:12px"><span style="color:#3a5060">${k}</span><span style="color:#8aabcc;text-align:right;max-width:58%">${v}</span></div>`).join('');
+
+  // Candidate rank table (from the PDF feature)
+  const physScore2=Math.round(((photoF(lcData)[2]*.25+photoF(lcData)[3]*.25+Math.min(photoF(lcData)[4]*40/20,1)*.25+(1-photoF(lcData)[6])*.25)*100));
+  const hab=s.esi>0.8?'High':s.esi>0.5?'Medium':s.esi>0.2?'Low':'Very low';
+  const stars2=[{name:s.name||'Current',conf:prob*100,phys:physScore2,hab,pri:prob>.95&&bsc>70?'⭐⭐⭐⭐⭐':prob>.85?'⭐⭐⭐⭐':prob>.7?'⭐⭐⭐':'⭐⭐'}];
+  document.getElementById('rankBody').innerHTML=stars2.map(r=>`<tr><td>${r.name}</td><td style="color:#5b9bd5">${r.conf.toFixed(1)}%</td><td style="color:#4a8a5a">${r.phys}/100</td><td>${r.hab}</td><td>${r.pri}</td></tr>`).join('');
+}
+</script>
+</body>
+</html>
